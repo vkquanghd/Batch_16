@@ -1,4 +1,6 @@
 import 'package:batch_16/signup/bloc/sign_up_cubit.dart';
+import 'package:batch_16/signup/bloc/test_sign_up_cubit.dart';
+import 'package:batch_16/signup/bloc/test_sign_up_state.dart';
 import 'package:flutter/material.dart';
 import 'package:batch_16/gen/assets.gen.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,11 +26,13 @@ class _HomeContent extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-      key: _scaffoldKey,
-      body: SafeArea(
-          child: SingleChildScrollView(
-        child: Container(
+  Widget build(BuildContext context) {
+    final cubit = context.read<SignUpCubit>();
+    return Scaffold(
+        key: _scaffoldKey,
+        body: SafeArea(
+            child: SingleChildScrollView(
+                child: Container(
           alignment: Alignment.center,
           child: Column(
             children: [
@@ -73,6 +77,10 @@ class _HomeContent extends StatelessWidget {
                   ),
                 ],
               ),
+              BlocProvider(
+                create: (_) => TestSignUpCubit(),
+                child: SignUpForm(),
+              ),
               Text('or'),
               BlocBuilder<SignUpCubit, SignUpState>(
                 builder: (context, state) {
@@ -82,91 +90,10 @@ class _HomeContent extends StatelessWidget {
                   return const SizedBox.shrink();
                 },
               ),
-              Container(
-                width: 350,
-                height: 199,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      // Thêm khoảng cách dọc
-                      child: IconTextFileRow(
-                        hint: 'Name',
-                        image: Assets.icons8User641.path,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      // Thêm khoảng cách dọc
-                      child: IconTextFileRow(
-                        hint: 'Email',
-                        image: Assets.email1.path,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      // Thêm khoảng cách dọc
-                      child: IconPasswordFileRow(
-                        image2: Assets.icons8ShowPassword321.path,
-                        hint: 'Password',
-                        image: Assets.icons8Password1001.path,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    print('Button pressed!');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    elevation: 15, // Độ nâng của nút
-
-                    backgroundColor: Color(0xFF27014A), // Màu nền của nút
-                  ),
-                  child: Text('Signup', style: TextStyle(color: Colors.white)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Text('or'),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GestureDetector(
-                  onTap: () {
-                    // Thực hiện hành động khi văn bản được nhấn
-                  },
-                  child: Text(
-                    'Already have an account?',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GestureDetector(
-                  onTap: () {
-                    // Thực hiện hành động khi văn bản được nhấn
-                  },
-                  child: Text(
-                    'Login',
-                    style: TextStyle(
-                        color: Color(0xFF023768),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12),
-                  ),
-                ),
-              ),
             ],
           ),
-        ),
-      )));
+        ))));
+  }
 }
 
 class AccountHolder extends StatelessWidget {
@@ -204,11 +131,17 @@ class AccountHolder extends StatelessWidget {
   }
 }
 
-class IconTextFileRow extends StatelessWidget {
-  const IconTextFileRow({required this.hint, required this.image, super.key});
-
+class CustomTextField extends StatelessWidget {
   final String image;
   final String hint;
+  final Function(String) onChanged;
+
+  const CustomTextField({
+    super.key,
+    required this.image,
+    required this.hint,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) => Row(
@@ -222,11 +155,9 @@ class IconTextFileRow extends StatelessWidget {
                     offset: Offset(2, 2),
                     blurRadius: 40)
               ], color: Colors.white, borderRadius: BorderRadius.circular(16)),
-              child: TextField(
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(8.0),
-                    hintText: hint),
+              child: TextFormField(
+                decoration: InputDecoration(hintText: hint),
+                onChanged: onChanged,
               ),
             ),
           )
@@ -235,45 +166,119 @@ class IconTextFileRow extends StatelessWidget {
 }
 
 class IconPasswordFileRow extends StatelessWidget {
-  const IconPasswordFileRow(
-      {required this.image2,
-      required this.hint,
-      required this.image,
-      super.key});
-
-  final String image;
+  final String image, image2;
   final String hint;
-  final String image2;
+  final Function(String) onChanged;
+
+  const IconPasswordFileRow({
+    super.key,
+    required this.image,
+    required this.image2,
+    required this.hint,
+    required this.onChanged,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Image.asset(image, width: 43, height: 43),
-        Expanded(
-          child: Container(
-            margin: const EdgeInsets.only(left: 8.0),
-            decoration: BoxDecoration(boxShadow: [
-              BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  offset: const Offset(2, 2),
-                  blurRadius: 40)
-            ], color: Colors.white, borderRadius: BorderRadius.circular(16)),
-            child: TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.all(8.0),
-                hintText: hint,
-                suffixIcon: Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Image.asset(image2, width: 24, height: 24),
+  Widget build(BuildContext context) => Row(
+        children: [
+          Image.asset(image, width: 43, height: 43),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    offset: Offset(2, 2),
+                    blurRadius: 40)
+              ], color: Colors.white, borderRadius: BorderRadius.circular(16)),
+              child: TextFormField(
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: hint,
+                  suffixIcon: Image.asset(image2, width: 24, height: 24),
                 ),
+                onChanged: onChanged,
               ),
             ),
-          ),
+          )
+        ],
+      );
+}
+
+class SignUpForm extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<TestSignUpCubit, TestSignUpState>(
+      listener: (context, state) {
+        if (state is SignUpSuccess) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Congratulations'),
+              content: Text('Please wait a little longer'),
+            ),
+          );
+        }
+      },
+      child: Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: CustomTextField(
+                      hint: 'Name',
+                      image: Assets.icons8User641.path,
+                      onChanged: (value) =>
+                          context.read<TestSignUpCubit>().nameChanged(value),
+                    )),
+                Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: CustomTextField(
+                      hint: 'Email',
+                      image: Assets.email1.path,
+                      onChanged: (value) =>
+                          context.read<TestSignUpCubit>().emailChanged(value),
+                    )),
+                Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: IconPasswordFileRow(
+                      hint: 'Password',
+                      image: Assets.icons8Password1001.path,
+                      image2: Assets.icons8ShowPassword321.path,
+                      onChanged: (value) => context
+                          .read<TestSignUpCubit>()
+                          .passwordChanged(value),
+                    )),
+              ],
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: () =>
+                  context.read<TestSignUpCubit>().signUpButtonPressed(),
+              style: ElevatedButton.styleFrom(
+                elevation: 15,
+                backgroundColor: Color(0xFF27014A),
+              ),
+              child: Text('Sign Up', style: TextStyle(color: Colors.white)),
+            ),
+            BlocBuilder<TestSignUpCubit, TestSignUpState>(
+              builder: (context, state) {
+                if (state is SignUpError) {
+                  return Text(
+                    state.errorMessage,
+                    style: TextStyle(color: Colors.red),
+                  );
+                }
+                return SizedBox.shrink();
+              },
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

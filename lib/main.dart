@@ -1,4 +1,5 @@
 import 'package:batch_16/signup/sign_up_screen_dart.dart';
+
 import 'package:flutter/material.dart';
 import 'package:batch_16/signup/sign_up_screen_dart.dart'; // Import file sign_up_screen.dart
 
@@ -11,8 +12,8 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: MyHome(), // Sử dụng SignUpScreen() làm trang chính của ứng dụng
+    return const MaterialApp(
+      home: MyHome(),
     );
   }
 }

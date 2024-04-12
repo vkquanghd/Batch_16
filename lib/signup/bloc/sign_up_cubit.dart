@@ -15,12 +15,4 @@ class SignUpCubit extends Cubit<SignUpState> {
   void signUpWithGoogle() {
     emit(GoogleSignUpNotSupported());
   }
-
-  void signUp(String name, String email, String password) {
-    if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      emit(SignUpValidationError(errorMessage: 'One or more fields are empty'));
-    } else {
-      emit(SignUpSuccess());
-    }
-  }
 }

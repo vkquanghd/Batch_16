@@ -8,11 +8,3 @@ final class SignUpInitial extends SignUpState {}
 class SignUpFailed extends SignUpState {}
 
 class GoogleSignUpNotSupported extends SignUpState {}
-
-class SignUpSuccess extends SignUpState {}
-
-class SignUpValidationError extends SignUpState {
-  final String errorMessage;
-
-  SignUpValidationError({required this.errorMessage});
-}
